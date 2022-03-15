@@ -1,8 +1,13 @@
 from math import floor
+from typing import Optional
 
 from assets.settings import grid_width, grid_height, square_size
+from src.game_object.base_game_object import BaseGameObject
 from src.game_object.game_object_factory import GameObjectFactory
 from src.utils.coordinates import from_coord_to_pos
+
+# type alias
+Square = Optional[BaseGameObject]
 
 
 class GameGrid:
@@ -18,10 +23,10 @@ class GameGrid:
     def __init__(self):
         self.height = floor(grid_height / square_size)
         self.width = floor(grid_width / square_size)
-        self.selected_square = None
+        self.selected_squares: list[Square] = []
+        self.squares: list[list[Square]] = []
 
         # Init an empty grid
-        self.squares = []
         for i in range(self.width):
             column = []
             for j in range(self.height):
@@ -36,12 +41,12 @@ class GameGrid:
                 if game_object is None:
                     string += " "
                 else:
-                    string += game_object.type[0]
+                    string += game_object.category[0]
                 string += "|"
             string += "\n------------------------\n"
         return string
 
-    def fill_first_line(self):
+    def fill_first_line(self) -> bool:
         """Loops over the first line and fills in the empty squares.
         Returns a boolean indicating if there was a modification."""
         has_changed = False
@@ -52,38 +57,78 @@ class GameGrid:
                 has_changed = True
         return has_changed
 
-    def get_square(self, coord):
+    def get_square(self, coord) -> Square:
+        """Returns the game object present at the given coordinates,
+        or None if it's empty or if they are out of bounds."""
+        if not (0 <= coord[0] < self.width
+                and 0 <= coord[1] < self.height):
+            return None
         return self.squares[coord[0]][coord[1]]
 
-    def set_square(self, coord, game_object):
+    def set_square(self, coord, game_object: Square):
         self.squares[coord[0]][coord[1]] = game_object
 
-    def is_free_below(self, coord):
+    def is_free_below(self, coord) -> bool:
         below = (coord[0], coord[1] + 1)
-        return below[1] < self.height and self.is_free(below)
-
-    def is_free(self, coord):
-        return self.get_square(coord) is None
+        return below[1] < self.height and self.get_square(below) is None
 
     def move_square(self, prev_coord, new_coord):
         game_object = self.get_square(prev_coord)
         self.set_square(prev_coord, None)
         self.set_square(new_coord, game_object)
 
-    def select_square(self, coord):
-        """Changes the current selected square.
+    def select_square(self, coord) -> bool:
+        """Changes the current selected squares.
         Returns a boolean indicating if there was a change."""
-        prev_selected = self.selected_square
-        new_selected = self.get_square(coord)
-        # No change
-        if prev_selected is new_selected:
+
+        # Check if the current hovered square is already selected
+        current_square = self.get_square(coord)
+        if current_square is not None and current_square.is_selected:
             return False
 
-        # Switch selected
-        if prev_selected is not None:
-            prev_selected.is_selected = False
-        self.selected_square = new_selected
-        if new_selected is not None and not new_selected.is_moving:
-            self.selected_square.is_selected = True
+        has_changed = False
+        # Deselect previous selection
+        prev_selected = self.selected_squares
+        for square in prev_selected:
+            has_changed = True
+            square.is_selected = False
 
+        # Select new selection
+        if current_square is None or current_square.is_moving:
+            return has_changed
+
+        # print("------- start selection -------")
+        new_selected = self.get_group(coord, current_square.category)
+        # print("------- end selection -------")
+        self.selected_squares = new_selected
         return True
+
+    def get_group(self, coord, category):
+        """Gets all adjacent (⬆⬇⬅➡) squares of the same category"""
+        current_square = self.get_square(coord)
+        if (current_square is None
+                or current_square.is_moving
+                or current_square.category != category
+                or current_square.is_selected):
+            # print(current_square, "REFUSED")
+            return []
+        else:
+            current_square.is_selected = True
+            square_list = [current_square]
+            # print(current_square, "ACCEPTED")
+
+        # Expand the search to the current square's neighbors
+        candidates = [
+            (coord[0] - 1, coord[1]),
+            (coord[0] + 1, coord[1]),
+            (coord[0], coord[1] - 1),
+            (coord[0], coord[1] + 1)
+        ]
+
+        for candidate in candidates:
+            # Add the result from the search to the list
+            found = self.get_group(candidate, category)
+            square_list.extend(found)
+
+        # Once search is done, return the updated list
+        return square_list

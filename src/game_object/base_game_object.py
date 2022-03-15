@@ -6,14 +6,17 @@ from src.utils.coordinates import from_pos_to_coord
 class BaseGameObject:
     """Represents a game object"""
 
-    def __init__(self, image_name, grid, pos=(0, 0), speed=3):
+    def __init__(self, image_name: str, grid, pos=(0, 0), speed=3):
         self.speed = speed
         self.image = image.load(image_name).convert_alpha()
         self.pos = self.image.get_rect().move(pos)
         self.grid = grid
-        self.type = None
+        self.category = None
         self.is_selected = False
         self.is_moving = False
+
+    def __str__(self):
+        return f"<'{self.category}', {self.pos.topleft}, selected={self.is_selected}, moving={self.is_moving}>"
 
     def move(self):
         """Checks if the object can move, and if possible, do it.

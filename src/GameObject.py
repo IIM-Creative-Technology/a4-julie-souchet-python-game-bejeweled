@@ -1,14 +1,21 @@
 from pygame import image
 
-from assets.settings import windows_width
+from assets.settings import windows_height
+
 
 class GameObject:
-    def __init__(self, imageName, pos = (0, 0), speed = 5):
+    def __init__(self, image_name, pos=(0, 0), speed=3):
         self.speed = speed
-        self.image = image.load(imageName).convert()
+        self.image = image.load(image_name).convert()
         self.pos = self.image.get_rect().move(pos)
-    
+
     def move(self):
-        self.pos = self.pos.move(self.speed, 0)
-        if self.pos.right > windows_width:
-            self.pos.left = 0
+        """Checks if the object can move, and if possible, do it.
+        Return true if the object has moved, or false otherwise."""
+        if self.can_move():
+            self.pos = self.pos.move(0, self.speed)
+            return True
+        return False
+
+    def can_move(self):
+        return self.pos.bottom < windows_height

@@ -13,11 +13,13 @@ class BaseGameObject:
         self.grid = grid
         self.type = None
         self.is_selected = False
+        self.is_moving = False
 
     def move(self):
         """Checks if the object can move, and if possible, do it.
         Return true if the object has moved, or false otherwise."""
         if self.can_move():
+            self.is_moving = True
             # Move
             prev_coord = from_pos_to_coord(self.pos)
             self.pos = self.pos.move(0, self.speed)
@@ -26,8 +28,10 @@ class BaseGameObject:
             if new_coord != prev_coord:
                 self.grid.move_square(prev_coord, new_coord)
 
-            return True
-        return False
+        else:
+            self.is_moving = False
+
+        return not self.is_moving
 
     def can_move(self):
         """Returns whether the object can move down"""

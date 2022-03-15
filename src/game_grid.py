@@ -83,7 +83,7 @@ class GameGrid:
         if prev_selected is not None:
             prev_selected.is_selected = False
         self.selected_square = new_selected
-        if self.selected_square is not None:
+        if new_selected is not None and not new_selected.is_moving:
             self.selected_square.is_selected = True
 
         return True

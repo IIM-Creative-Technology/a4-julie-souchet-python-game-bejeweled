@@ -1,4 +1,4 @@
-from pygame import time, display, draw, Color, event
+from pygame import time, display, event
 
 from src import screen
 from src.game_grid import GameGrid
@@ -7,8 +7,8 @@ from src.utils.coordinates import from_pos_to_coord
 
 class GameEngine:
     def __init__(self):
+        screen.init()
         self.grid = GameGrid()
-        self.screen = screen.init()
         self.has_changed = False
 
     def tick(self):
@@ -35,10 +35,6 @@ class GameEngine:
             for game_object in column:
                 # Skip empty squares
                 if game_object is not None:
-                    # Add an indicator to show the selected object
-                    if game_object.is_selected:
-                        draw.rect(self.screen, Color(0, 0, 0), game_object.pos)
-                    # Draw the object itself
                     screen.draw_object(game_object)
         display.flip()
 

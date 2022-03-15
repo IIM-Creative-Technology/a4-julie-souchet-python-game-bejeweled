@@ -1,4 +1,4 @@
-from pygame import display
+from pygame import display, draw, Color
 
 from assets.settings import windows_width, windows_height
 
@@ -9,7 +9,6 @@ def init():
     global screen
     if screen is None:
         screen = display.set_mode((windows_width, windows_height))
-    return screen
 
 
 def draw_background():
@@ -17,4 +16,8 @@ def draw_background():
 
 
 def draw_object(game_object):
+    # Add an indicator to show the selected object
+    if game_object.is_selected:
+        draw.rect(screen, Color(0, 0, 0), game_object.pos)
+    # Draw the object itself
     screen.blit(game_object.image, game_object.pos)

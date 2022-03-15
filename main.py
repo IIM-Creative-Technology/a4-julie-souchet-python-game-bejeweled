@@ -3,19 +3,20 @@ import sys
 import pygame
 from pygame.locals import *
 
-from src import screen
 from src.game_engine import GameEngine
 
 pygame.init()
 
 # Initialisation
 pygame.display.set_caption("Pyjeweled")
-screen.init()
 engine = GameEngine()
 
 # Allow only events that are relevant
-pygame.event.set_allowed(pygame.MOUSEMOTION)
-pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
+pygame.event.set_allowed([
+    MOUSEMOTION,
+    MOUSEBUTTONUP,
+    MOUSEBUTTONDOWN
+])
 
 loop = True
 while loop:

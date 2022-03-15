@@ -13,6 +13,10 @@ pygame.display.set_caption("Pyjeweled")
 screen.init()
 engine = GameEngine()
 
+# Allow only events that are relevant
+pygame.event.set_allowed(pygame.MOUSEMOTION)
+pygame.event.set_allowed(pygame.MOUSEBUTTONDOWN)
+
 loop = True
 while loop:
     # Update the game
@@ -21,8 +25,12 @@ while loop:
     # Read player inputs
     for event in pygame.event.get():
         # Click the close button = quit game
-        if event.type is QUIT:
+        if event.type == QUIT:
             loop = False
+        elif event.type == MOUSEMOTION:
+            engine.handle_mouse_motion(event)
+        elif event.type == MOUSEBUTTONDOWN:
+            engine.handle_mouse_down(event)
 
 pygame.quit()
 sys.exit()

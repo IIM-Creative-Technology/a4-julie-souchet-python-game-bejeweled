@@ -8,7 +8,7 @@ from src.utils.coordinates import from_coord_to_pos
 class GameGrid:
     """
     Represents the game's grid,
-    with squares that can be either empty or filled
+    with squares that can be either empty (=`None`) or filled
     by a GameObject.
     The coordinates are independent of the size of the squares in pixels,
     but instead are worth 1 per square.
@@ -18,6 +18,7 @@ class GameGrid:
     def __init__(self):
         self.height = floor(grid_height / square_size)
         self.width = floor(grid_width / square_size)
+        self.selected_square = None
 
         # Init an empty grid
         self.squares = []
@@ -68,3 +69,21 @@ class GameGrid:
         game_object = self.get_square(prev_coord)
         self.set_square(prev_coord, None)
         self.set_square(new_coord, game_object)
+
+    def select_square(self, coord):
+        """Changes the current selected square.
+        Returns a boolean indicating if there was a change."""
+        prev_selected = self.selected_square
+        new_selected = self.get_square(coord)
+        # No change
+        if prev_selected is new_selected:
+            return False
+
+        # Switch selected
+        if prev_selected is not None:
+            prev_selected.is_selected = False
+        self.selected_square = new_selected
+        if self.selected_square is not None:
+            self.selected_square.is_selected = True
+
+        return True

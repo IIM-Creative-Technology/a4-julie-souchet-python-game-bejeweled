@@ -3,11 +3,14 @@ from pygame import image
 from assets.settings import windows_height
 
 
-class GameObject:
-    def __init__(self, image_name, pos=(0, 0), speed=3):
+class BaseGameObject:
+    """Represents a game object"""
+
+    def __init__(self, image_name, pos, speed):
         self.speed = speed
         self.image = image.load(image_name).convert()
         self.pos = self.image.get_rect().move(pos)
+        self.type = None
 
     def move(self):
         """Checks if the object can move, and if possible, do it.

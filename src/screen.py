@@ -16,5 +16,4 @@ def draw_background():
 
 
 def draw_object(game_object):
-    print(game_object.image, game_object.pos)
     screen.blit(game_object.image, game_object.pos)

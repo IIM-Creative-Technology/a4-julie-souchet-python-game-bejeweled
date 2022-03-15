@@ -4,7 +4,7 @@ import pygame
 from pygame.locals import *
 
 from src import screen
-from src.GameEngine import GameEngine
+from src.game_engine import GameEngine
 
 pygame.init()
 

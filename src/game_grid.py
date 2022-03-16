@@ -2,19 +2,19 @@ from math import floor
 from typing import Optional
 
 from assets.settings import grid_width, grid_height, square_size, minimum_selection
-from src.game_object.base_game_object import BaseGameObject
-from src.game_object.game_object_factory import GameObjectFactory
+from src.game_objects.square.base_square import BaseSquare
+from src.game_objects.square.square_factory import SquareFactory
 from src.utils.coordinates import from_coord_to_pos, from_pos_to_coord
 
 # type alias
-Square = Optional[BaseGameObject]
+Square = Optional[BaseSquare]
 
 
 class GameGrid:
     """
     Represents the game's grid,
     with squares that can be either empty (=`None`) or filled
-    by a GameObject.
+    by a Square.
     The coordinates are independent of the size of the squares in pixels,
     but instead are worth 1 per square.
     You can access a specific square with grid.squares[column][line]
@@ -26,12 +26,12 @@ class GameGrid:
         self.selected_squares: list[Square] = []
         self.squares: list[list[Square]] = []
 
-        # Init an empty grid
-        for i in range(self.width):
+        # Initializes the grid with random squares
+        for x in range(self.width):
             column = []
-            for j in range(self.height):
-                pos = from_coord_to_pos((i, j))
-                column.append(GameObjectFactory.get_random_item(self, pos))
+            for y in range(self.height):
+                pos = from_coord_to_pos((x, y))
+                column.append(SquareFactory.get_random_item(self, pos))
             self.squares.append(column)
 
     def __str__(self):
@@ -47,6 +47,13 @@ class GameGrid:
             string += "\n------------------------\n"
         return string
 
+    def reset(self):
+        """Fills the whole grid with random squares"""
+        for x in range(self.width):
+            for y in range(self.height):
+                pos = from_coord_to_pos((x, y))
+                self.set_square((x, y), SquareFactory.get_random_item(self, pos))
+
     def fill_first_line(self) -> bool:
         """Loops over the first line and fills in the empty squares.
         Returns a boolean indicating if there was a modification."""
@@ -54,7 +61,7 @@ class GameGrid:
         for column in range(self.width):
             if self.squares[column][0] is None:
                 pos = from_coord_to_pos((column, 0))
-                self.squares[column][0] = GameObjectFactory.get_random_item(self, pos)
+                self.squares[column][0] = SquareFactory.get_random_item(self, pos)
                 has_changed = True
         return has_changed
 

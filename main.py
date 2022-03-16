@@ -4,6 +4,7 @@ import pygame
 from pygame.locals import *
 
 from src.game_engine import GameEngine
+from src.game_objects.menu.game_over_overlay import RESET
 
 pygame.init()
 
@@ -29,9 +30,11 @@ while loop:
         if event.type == QUIT:
             loop = False
         elif event.type == MOUSEMOTION:
-            engine.handle_mouse_motion(event)
+            engine.on_mouse_motion(event)
         elif event.type == MOUSEBUTTONDOWN:
-            engine.handle_mouse_down()
+            engine.on_mouse_down(event)
+        elif event.type == RESET:
+            engine.reset()
 
 print("Bye!")
 pygame.quit()

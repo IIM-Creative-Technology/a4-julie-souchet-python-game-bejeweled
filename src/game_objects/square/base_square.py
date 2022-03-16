@@ -1,15 +1,13 @@
-from pygame import image
-
+from src.game_objects.base_game_object import BaseGameObject
 from src.utils.coordinates import from_pos_to_coord
 
 
-class BaseGameObject:
-    """Represents a game object"""
+class BaseSquare(BaseGameObject):
+    """Represents a square"""
 
-    def __init__(self, image_name: str, grid, pos=(0, 0), speed=5):
+    def __init__(self, image_name: str, grid=None, pos=(0, 0), speed=5):
+        super().__init__(image_name, pos)
         self.speed = speed
-        self.image = image.load(image_name).convert_alpha()
-        self.pos = self.image.get_rect().move(pos)
         self.grid = grid
         self.category = None
         self.is_selected = False
@@ -21,7 +19,7 @@ class BaseGameObject:
     def move(self):
         """Checks if the object can move, and if possible, do it.
         Return true if the object has moved, or false otherwise."""
-        if self.can_move():
+        if self.speed > 0 and self.grid is not None and self.can_move():
             self.is_moving = True
             # Move
             prev_coord = from_pos_to_coord(self.pos)
@@ -40,7 +38,3 @@ class BaseGameObject:
         """Returns whether the object can move down"""
         coord = from_pos_to_coord(self.pos)
         return self.grid.is_free_below(coord)
-
-    def is_in(self, pos):
-        """Returns whether the given point is inside the object"""
-        return self.pos.collidepoint(pos)

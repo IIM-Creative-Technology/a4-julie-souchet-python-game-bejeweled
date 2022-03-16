@@ -1,9 +1,9 @@
 from typing import Optional
 
-from pygame import display, draw, Surface, SRCALPHA
+from pygame import display, draw, Surface
 
 from assets.settings import windows_width, windows_height, select_color, background_color, grid_width, total_time, \
-    timer_width, overlay_background_color, infinite_mode
+    timer_width, infinite_mode
 
 screen: Optional[Surface] = None
 
@@ -18,10 +18,10 @@ def init():
         screen = display.set_mode((width, windows_height))
 
 
-def draw_screen(game_over, game_objects, time_left):
+def draw_screen(game_over, squares, time, overlay):
     """Re-draws the screen according to the current game state"""
     draw_background()
-    for column in game_objects:
+    for column in squares:
         for game_object in column:
             # Skip empty squares
             if game_object is not None:
@@ -29,9 +29,9 @@ def draw_screen(game_over, game_objects, time_left):
 
     # Add game over overlay if necessary
     if game_over:
-        draw_overlay()
+        screen.blit(overlay, (0, 0))
     else:
-        draw_timer(time_left)
+        draw_timer(time)
 
     display.flip()
 
@@ -58,9 +58,3 @@ def draw_timer(time: float):
             windows_height * time / total_time,  # height: diminishes
         )  # bottom stays constant at the bottom of the screen
         draw.rect(screen, select_color, rect)
-
-
-def draw_overlay():
-    overlay = Surface((windows_width, windows_height), SRCALPHA)  # alpha in pixels
-    overlay.fill(overlay_background_color)
-    screen.blit(overlay, (0, 0))

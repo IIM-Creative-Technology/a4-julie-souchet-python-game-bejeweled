@@ -144,16 +144,18 @@ class GameGrid:
         # Once search is done, return the updated list
         return square_list
 
-    def remove_selected(self):
-        """Deletes the selected squares"""
+    def remove_selected(self) -> bool:
+        """Deletes the selected squares.
+        Return True if any were deleted."""
         # If there aren't enough selected squares -> ignore
         if self.selected_squares.__len__() < minimum_selection:
-            return
+            return False
 
         for square in self.selected_squares:
             coord = from_pos_to_coord(square.pos)
             self.set_square(coord, None)
         self.selected_squares.clear()
+        return True
 
     def clear_selection(self):
         """Unselect all selected squares"""

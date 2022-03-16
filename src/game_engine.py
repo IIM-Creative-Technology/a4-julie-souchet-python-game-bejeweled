@@ -4,6 +4,7 @@ from assets.settings import total_time, infinite_mode
 from src import screen
 from src.game_grid import GameGrid
 from src.game_objects.menu.game_over_overlay import GameOverOverlay
+from src.sound_engine import SoundEngine
 from src.utils.coordinates import from_pos_to_coord
 
 
@@ -12,6 +13,7 @@ class GameEngine:
 
     def __init__(self):
         screen.init()
+        self.sound = SoundEngine()
         self.game_over_overlay = GameOverOverlay()
         self.grid = GameGrid()
         self.has_changed = False
@@ -30,6 +32,7 @@ class GameEngine:
 
     def end_game(self):
         """Ends the game, blocks controls"""
+        self.sound.play("win")
         self.game_over = True
         event.set_allowed(QUIT)
         self.grid.clear_selection()
@@ -73,7 +76,9 @@ class GameEngine:
         """Deletes the selected group"""
         event.pump()
         if not self.game_over:
-            self.grid.remove_selected()
+            did_delete = self.grid.remove_selected()
+            if did_delete:
+                self.sound.play("delete")
         else:
             self.game_over_overlay.click(e.pos)
 

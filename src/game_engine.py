@@ -1,6 +1,6 @@
 from pygame import time, display, event, mouse, QUIT
 
-from assets.settings import minimum_selection, total_time
+from assets.settings import minimum_selection, total_time, infinite_mode
 from src import screen
 from src.game_grid import GameGrid
 from src.utils.coordinates import from_pos_to_coord
@@ -16,12 +16,14 @@ class GameEngine:
 
     def tick(self):
         """Periodically updates the game state"""
-        if self.time_left <= 0:  # After game over
+        if self.time_left == 0:  # After game over
             if not self.game_over:
                 self.end_game()
             self.has_changed = self.update_squares() or self.has_changed
         else:  # Normal gameplay
-            self.time_left -= 20
+            if not infinite_mode:
+                self.time_left -= 10
+
             self.has_changed = self.grid.fill_first_line() or self.has_changed
             self.has_changed = self.update_squares() or self.has_changed
 

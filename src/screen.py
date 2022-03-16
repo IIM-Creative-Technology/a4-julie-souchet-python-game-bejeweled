@@ -3,7 +3,7 @@ from typing import Optional
 from pygame import display, draw, Surface, SRCALPHA
 
 from assets.settings import windows_width, windows_height, select_color, background_color, grid_width, total_time, \
-    timer_width, overlay_background_color
+    timer_width, overlay_background_color, infinite_mode
 
 screen: Optional[Surface] = None
 
@@ -11,7 +11,11 @@ screen: Optional[Surface] = None
 def init():
     global screen
     if screen is None:
-        screen = display.set_mode((windows_width, windows_height))
+        if not infinite_mode:
+            width = windows_width
+        else:
+            width = grid_width
+        screen = display.set_mode((width, windows_height))
 
 
 def draw_background():
@@ -28,13 +32,14 @@ def draw_object(game_object):
 
 def draw_timer(time: float):
     # TODO change progress bar color according to time left
-    rect = (
-        grid_width + 20,  # left
-        windows_height * (total_time - time) / total_time,  # top: goes down
-        timer_width,  # width
-        windows_height * time / total_time,  # height: diminishes
-    )  # bottom stays constant at the bottom of the screen
-    draw.rect(screen, select_color, rect)
+    if not infinite_mode:
+        rect = (
+            grid_width + 20,  # left
+            windows_height * (total_time - time) / total_time,  # top: goes down
+            timer_width,  # width
+            windows_height * time / total_time,  # height: diminishes
+        )  # bottom stays constant at the bottom of the screen
+        draw.rect(screen, select_color, rect)
 
 
 def draw_overlay():

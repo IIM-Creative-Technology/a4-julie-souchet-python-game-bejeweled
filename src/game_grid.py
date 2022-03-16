@@ -30,7 +30,8 @@ class GameGrid:
         for i in range(self.width):
             column = []
             for j in range(self.height):
-                column.append(None)
+                pos = from_coord_to_pos((i, j))
+                column.append(GameObjectFactory.get_random_item(self, pos))
             self.squares.append(column)
 
     def __str__(self):

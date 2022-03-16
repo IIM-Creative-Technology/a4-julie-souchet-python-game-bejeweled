@@ -5,8 +5,9 @@ from assets.settings import grid_width, grid_height, square_size, minimum_select
 from src.game_objects.square.base_square import BaseSquare
 from src.game_objects.square.square_factory import SquareFactory
 from src.utils.coordinates import from_coord_to_pos, from_pos_to_coord
-
 # type alias
+from src.utils.selection import calculate_group
+
 Square = Optional[BaseSquare]
 
 
@@ -107,42 +108,10 @@ class GameGrid:
             return has_changed
 
         # print("------- start selection -------")
-        new_selected = self.calculate_group(coord, current_square.category)
+        new_selected = calculate_group(self, coord, current_square.category)
         # print("------- end selection -------")
         self.selected_squares = new_selected
         return True
-
-    def calculate_group(self, coord, category):
-        """Gets all adjacent (⬆⬇⬅➡) squares of the same category
-        with a tree search"""
-        # Test current square
-        current_square = self.get_square(coord)
-        if (current_square is None
-                or current_square.is_moving
-                or current_square.category != category
-                or current_square.is_selected):
-            # print("REFUSED", current_square)
-            return []
-        else:
-            current_square.is_selected = True
-            square_list = [current_square]
-            # print("ACCEPTED", current_square)
-
-        # Expand the search to the current square's neighbors
-        candidates = [
-            (coord[0] - 1, coord[1]),
-            (coord[0] + 1, coord[1]),
-            (coord[0], coord[1] - 1),
-            (coord[0], coord[1] + 1)
-        ]
-
-        for candidate in candidates:
-            # Add the result from the search to the list
-            found = self.calculate_group(candidate, category)
-            square_list.extend(found)
-
-        # Once search is done, return the updated list
-        return square_list
 
     def remove_selected(self) -> int:
         """Deletes the selected squares.

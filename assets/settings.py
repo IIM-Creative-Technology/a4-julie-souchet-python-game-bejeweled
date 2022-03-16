@@ -14,4 +14,4 @@ overlay_background_color = Color(0, 0, 0, 160)
 # Gameplay
 minimum_selection = 3
 total_time = 600  # in milliseconds, must be > 0
-infinite_mode = True
+infinite_mode = False

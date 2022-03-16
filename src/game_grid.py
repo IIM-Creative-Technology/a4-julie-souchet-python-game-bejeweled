@@ -1,10 +1,10 @@
 from math import floor
 from typing import Optional
 
-from assets.settings import grid_width, grid_height, square_size
+from assets.settings import grid_width, grid_height, square_size, minimum_selection
 from src.game_object.base_game_object import BaseGameObject
 from src.game_object.game_object_factory import GameObjectFactory
-from src.utils.coordinates import from_coord_to_pos
+from src.utils.coordinates import from_coord_to_pos, from_pos_to_coord
 
 # type alias
 Square = Optional[BaseGameObject]
@@ -100,12 +100,12 @@ class GameGrid:
             return has_changed
 
         # print("------- start selection -------")
-        new_selected = self.get_group(coord, current_square.category)
+        new_selected = self.calculate_group(coord, current_square.category)
         # print("------- end selection -------")
         self.selected_squares = new_selected
         return True
 
-    def get_group(self, coord, category):
+    def calculate_group(self, coord, category):
         """Gets all adjacent (⬆⬇⬅➡) squares of the same category
         with a tree search"""
         # Test current square
@@ -131,8 +131,29 @@ class GameGrid:
 
         for candidate in candidates:
             # Add the result from the search to the list
-            found = self.get_group(candidate, category)
+            found = self.calculate_group(candidate, category)
             square_list.extend(found)
 
         # Once search is done, return the updated list
         return square_list
+
+    def remove_selected(self):
+        """Deletes the selected squares"""
+        # If there aren't enough selected squares -> ignore
+        if self.selected_squares.__len__() < minimum_selection:
+            return
+
+        for square in self.selected_squares:
+            coord = from_pos_to_coord(square.pos)
+            self.set_square(coord, None)
+        self.selected_squares.clear()
+
+    def clear_selection(self):
+        """Unselect all selected squares"""
+        # If there is no selection -> ignore
+        if self.selected_squares.__len__() == 0:
+            return
+
+        for square in self.selected_squares:
+            square.is_selected = False
+        self.selected_squares.clear()

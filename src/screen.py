@@ -18,6 +18,24 @@ def init():
         screen = display.set_mode((width, windows_height))
 
 
+def draw_screen(game_over, game_objects, time_left):
+    """Re-draws the screen according to the current game state"""
+    draw_background()
+    for column in game_objects:
+        for game_object in column:
+            # Skip empty squares
+            if game_object is not None:
+                draw_object(game_object)
+
+    # Add game over overlay if necessary
+    if game_over:
+        draw_overlay()
+    else:
+        draw_timer(time_left)
+
+    display.flip()
+
+
 def draw_background():
     screen.fill(background_color)
 

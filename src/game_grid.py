@@ -78,8 +78,9 @@ class GameGrid:
         self.set_square(new_coord, game_object)
 
     def select_square(self, coord) -> bool:
-        """Changes the current selected squares.
-        Returns a boolean indicating if there was a change."""
+        """Select the group of adjacent squares of similar type,
+        starting from the given coordinates.
+        Returns a boolean indicating if there was a change in selection."""
 
         # Check if the current hovered square is already selected
         current_square = self.get_square(coord)

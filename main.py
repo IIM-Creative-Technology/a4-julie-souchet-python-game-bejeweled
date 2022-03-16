@@ -31,7 +31,7 @@ while loop:
         elif event.type == MOUSEMOTION:
             engine.handle_mouse_motion(event)
         elif event.type == MOUSEBUTTONDOWN:
-            engine.handle_mouse_down(event)
+            engine.handle_mouse_down()
 
 print("Bye!")
 pygame.quit()

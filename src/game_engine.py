@@ -16,30 +16,30 @@ class GameEngine:
         self.sound = SoundEngine()
         self.game_over_overlay = GameOverOverlay()
         self.grid = GameGrid()
+        # Settings
+        self.difficulty = "hard"
+        self.infinite_mode = infinite_mode
         # Internal game state
         self.has_changed = False
         self.game_over = None
+        self.time_left = total_time.get(self.difficulty)
         self.count = 0
-        # Settings
-        self.goal = goals.get("medium")
-        self.time_left = total_time
-        self.infinite_mode = infinite_mode
 
-    def reset(self, new_time_left=total_time, new_infinite_mode=infinite_mode, goal="medium"):
+    def reset(self, new_infinite_mode=infinite_mode, difficulty="hard"):
         """Resets the game state"""
         self.grid.reset()
         self.has_changed = False
         self.game_over = None
         self.count = 0
+        self.time_left = total_time.get(difficulty)
         # Customizable settings
-        self.time_left = new_time_left
         self.infinite_mode = new_infinite_mode
-        self.goal = goals.get(goal)
+        self.difficulty = difficulty
 
     def end_game(self):
         """Ends the game"""
         self.grid.clear_selection()
-        if self.count < self.goal:
+        if self.count < goals.get(self.difficulty):
             self.game_over = "lose"
         else:
             self.game_over = "win"
@@ -66,7 +66,9 @@ class GameEngine:
                 game_over=self.game_over is not None,
                 squares=self.grid.squares,
                 time=self.time_left,
-                overlay=self.game_over_overlay.surface
+                overlay=self.game_over_overlay.surface,
+                difficulty=self.difficulty,
+                count=self.count,
             )
             self.has_changed = False
         time.wait(20)

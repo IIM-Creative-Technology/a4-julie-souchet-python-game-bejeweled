@@ -1,6 +1,6 @@
 from pygame import time, display, event, mouse
 
-from assets.settings import minimum_selection
+from assets.settings import minimum_selection, total_time
 from src import screen
 from src.game_grid import GameGrid
 from src.utils.coordinates import from_pos_to_coord
@@ -11,9 +11,13 @@ class GameEngine:
         screen.init()
         self.grid = GameGrid()
         self.has_changed = False
+        self.time_left = total_time
 
     def tick(self):
         """Periodically updates the game state"""
+        # Updates the timer
+        self.time_left -= 20
+
         # Is the first line of the grid full yet?
         self.has_changed = self.grid.fill_first_line() or self.has_changed
 
@@ -38,6 +42,7 @@ class GameEngine:
     def draw_screen(self):
         """Re-draws the screen according to the current game state"""
         screen.draw_background()
+        screen.draw_timer(self.time_left)
         for column in self.grid.squares:
             for game_object in column:
                 # Skip empty squares

@@ -2,7 +2,8 @@ from typing import Optional
 
 from pygame import display, draw, Surface
 
-from assets.settings import windows_width, windows_height, select_color, background_color
+from assets.settings import windows_width, windows_height, select_color, background_color, grid_width, total_time, \
+    timer_width
 
 screen: Optional[Surface] = None
 
@@ -23,3 +24,14 @@ def draw_object(game_object):
         draw.rect(screen, select_color, game_object.pos)
     # Draw the object itself
     screen.blit(game_object.image, game_object.pos)
+
+
+def draw_timer(time: float):
+    # TODO change progress bar color according to time left
+    rect = (
+        grid_width + 20,  # left
+        windows_height * (total_time - time) / total_time,  # top: goes down
+        timer_width,  # width
+        windows_height * time / total_time,  # height: diminishes
+    )  # bottom stays constant at the bottom of the screen
+    draw.rect(screen, select_color, rect)

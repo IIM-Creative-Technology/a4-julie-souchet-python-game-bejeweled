@@ -6,7 +6,7 @@ from src.utils.coordinates import from_pos_to_coord
 class BaseGameObject:
     """Represents a game object"""
 
-    def __init__(self, image_name: str, grid, pos=(0, 0), speed=4):
+    def __init__(self, image_name: str, grid, pos=(0, 0), speed=5):
         self.speed = speed
         self.image = image.load(image_name).convert_alpha()
         self.pos = self.image.get_rect().move(pos)

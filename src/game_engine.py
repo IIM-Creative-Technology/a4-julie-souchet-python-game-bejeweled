@@ -1,5 +1,6 @@
 from pygame import time, display, event, mouse
 
+from assets.settings import minimum_selection
 from src import screen
 from src.game_grid import GameGrid
 from src.utils.coordinates import from_pos_to_coord
@@ -56,8 +57,8 @@ class GameEngine:
         self.remove_selected()
 
     def remove_selected(self):
-        # If there is no selection -> ignore
-        if self.grid.selected_squares.__len__() == 0:
+        # If there aren't enough selected squares -> ignore
+        if self.grid.selected_squares.__len__() < minimum_selection:
             return
 
         for square in self.grid.selected_squares:

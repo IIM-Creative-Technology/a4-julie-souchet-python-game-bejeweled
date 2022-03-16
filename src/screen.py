@@ -1,8 +1,10 @@
-from pygame import display, draw, Color
+from typing import Optional
 
-from assets.settings import windows_width, windows_height
+from pygame import display, draw, Surface
 
-screen = None
+from assets.settings import windows_width, windows_height, select_color, background_color
+
+screen: Optional[Surface] = None
 
 
 def init():
@@ -12,12 +14,12 @@ def init():
 
 
 def draw_background():
-    screen.fill((255, 255, 255))
+    screen.fill(background_color)
 
 
 def draw_object(game_object):
     # Add an indicator to show the selected object
     if game_object.is_selected:
-        draw.rect(screen, Color(0, 0, 0), game_object.pos)
+        draw.rect(screen, select_color, game_object.pos)
     # Draw the object itself
     screen.blit(game_object.image, game_object.pos)

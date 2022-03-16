@@ -5,10 +5,10 @@ class SoundEngine:
     def __init__(self):
         mixer.init()
         self.sounds = {
-            "delete": mixer.Sound("assets/sparkle.wav"),
-            "win": mixer.Sound("assets/win.wav"),
-            "lose": mixer.Sound("assets/lose.wav"),
-            "impact": mixer.Sound("assets/impact.wav"),
+            "delete": mixer.Sound("assets/sounds/sparkle.wav"),
+            "win": mixer.Sound("assets/sounds/win.wav"),
+            "lose": mixer.Sound("assets/sounds/lose.wav"),
+            "impact": mixer.Sound("assets/sounds/impact.wav"),
         }
 
     def play(self, name: str):

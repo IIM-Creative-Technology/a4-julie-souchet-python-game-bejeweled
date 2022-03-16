@@ -3,18 +3,18 @@ from typing import Optional
 from pygame import display, draw, Surface, Rect, font
 
 from src.settings import windows_width, windows_height, select_color, background_color, grid_width, total_time, \
-    progress_bar_width, infinite_mode, goal_reached_color, goal_not_reached_color, goals, goal_hints
+    progress_bar_width, default_infinite, goal_reached_color, goal_not_reached_color, goals, goal_hints
 
 screen: Optional[Surface] = None
 font.init()
 main_font = font.SysFont("Arial", 12)
-title_font = font.Font("assets/HomemadeApple-Regular.ttf", 36)
+title_font = font.Font("assets/fonts/HomemadeApple-Regular.ttf", 36)
 
 
 def init():
     global screen
     if screen is None:
-        if not infinite_mode:
+        if not default_infinite:
             width = windows_width
         else:
             width = grid_width
@@ -31,8 +31,8 @@ def draw_screen(game_over, squares, time, overlay, difficulty, count):
             if game_object is not None:
                 draw_object(game_object)
 
-    # Add game over overlay if necessary
-    if game_over:
+    # Add overlay if necessary
+    if overlay is not None:
         screen.blit(overlay, (0, 0))
     else:
         draw_timer(time, total_time.get(difficulty))
@@ -55,7 +55,7 @@ def draw_object(game_object):
 
 def draw_timer(time: float, total: int):
     # TODO change progress bar color according to time left
-    if not infinite_mode:
+    if not default_infinite:
         rect = (
             grid_width + 20 + progress_bar_width,  # left
             windows_height * (total - time) / total,  # top: goes down

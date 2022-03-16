@@ -1,15 +1,15 @@
 import random
 
-from pygame import time, event, mouse
+from pygame import time, mouse
 
 from src import screen
 from src.game_grid import GameGrid
 from src.game_objects.menu.game_over_overlay import GameOverOverlay
-from src.settings import total_time, infinite_mode, goals
+from src.game_objects.menu.start_overlay import StartOverlay
+from src.settings import total_time, default_infinite, goals, default_difficulty
 from src.sound_engine import SoundEngine
 from src.utils.coordinates import from_pos_to_coord
-
-DEBOUNCE_ALLOW = event.custom_type()
+from src.utils.custom_events import *
 
 
 class GameEngine:
@@ -19,29 +19,39 @@ class GameEngine:
         screen.init()
         self.sound = SoundEngine()
         self.game_over_overlay = GameOverOverlay()
+        self.start_overlay = StartOverlay()
         self.grid = GameGrid()
         # Settings
-        self.difficulty = "medium"
-        self.infinite_mode = infinite_mode
+        self.difficulty = default_difficulty
+        self.is_infinite = default_infinite
         # Internal game state
-        self.has_changed = False
-        self.game_over = None
-        self.start_time = 0
-        self.time_left = total_time.get(self.difficulty)
         self.count = 0
         self.debounce = False
-
-    def reset(self, new_infinite_mode=infinite_mode, difficulty="easy"):
-        """Resets the game state"""
-        self.grid.reset()
-        self.has_changed = False
         self.game_over = None
+        self.has_changed = True
+        self.has_started = False
+        self.start_time = 0
+        self.time_left = total_time.get(self.difficulty)
+
+    def reset(self):
+        """Resets the game state"""
+        # Internal game state
         self.count = 0
+        self.debounce = False
+        self.game_over = None
+        self.has_changed = True
+        self.has_started = False
+
+    def start(self, difficulty, is_infinite=default_infinite):
+        print(f"Started game on {difficulty} (infinite={is_infinite})")
+        self.grid.reset()
+        # Customizable settings
+        self.difficulty = difficulty
+        self.is_infinite = is_infinite
+        # Internal game state
+        self.has_started = True
         self.start_time = time.get_ticks()
         self.time_left = total_time.get(self.difficulty)
-        # Customizable settings
-        self.infinite_mode = new_infinite_mode
-        self.difficulty = difficulty
 
     def end_game(self):
         """Ends the game"""
@@ -54,50 +64,60 @@ class GameEngine:
 
     def tick(self):
         """Periodically updates the game state"""
-        if not infinite_mode:
-            self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
+        time.wait(20)
+        overlay = None
+        if not self.has_started:
+            overlay = self.start_overlay.surface
+        else:
+            if not self.is_infinite:  # Infinite mode
+                self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
 
-        if self.time_left <= 0:  # After game over
-            if self.game_over is None:
-                self.end_game()
-            self.has_changed = self.update_squares() or self.has_changed
-        else:  # Normal gameplay
-            self.has_changed = self.grid.fill_first_line() or self.has_changed
-            self.has_changed = self.update_squares() or self.has_changed
+            if self.time_left <= 0:  # After game over
+                overlay = self.game_over_overlay.surface
+                self.has_changed = self.update_squares() or self.has_changed
+                if self.game_over is None:
+                    self.end_game()
 
-            if self.has_changed:
-                self.update_selection()
+            else:  # Normal gameplay
+                self.has_changed = self.grid.fill_first_line() or self.has_changed
+                self.has_changed = self.update_squares() or self.has_changed
+
+                if self.has_changed:
+                    self.update_selection()
 
         if self.has_changed:
             screen.draw_screen(
                 game_over=self.game_over is not None,
                 squares=self.grid.squares,
                 time=self.time_left,
-                overlay=self.game_over_overlay.surface,
+                overlay=overlay,
                 difficulty=self.difficulty,
                 count=self.count,
             )
             self.has_changed = False
-        time.wait(20)
 
     def on_mouse_motion(self, e):
         """Selects the group under the cursor"""
         event.pump()
-        if self.game_over is None:
+        if not self.has_started:  # start menu
+            self.start_overlay.on_mouse_motion(e.pos)
+        elif self.game_over is None:  # main game
             coord = from_pos_to_coord(e.pos)
             self.has_changed = self.grid.select(coord)
-        else:
+        else:  # game over menu
             self.game_over_overlay.on_mouse_motion(e.pos)
 
     def on_mouse_down(self, e):
         """Deletes the selected group"""
         event.pump()
-        if self.game_over is None:
+        if not self.has_started:  # start menu
+            self.start_overlay.click(e.pos)
+        elif self.game_over is None:  # main game
             delete_count = self.grid.remove_selected()
             if delete_count > 0:
                 self.count += delete_count
                 self.sound.play("delete")
-        else:
+        else:  # game over menu
             self.game_over_overlay.click(e.pos)
 
     def update_squares(self) -> bool:

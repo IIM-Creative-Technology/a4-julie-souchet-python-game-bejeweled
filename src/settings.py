@@ -30,4 +30,5 @@ total_time = {  # in milliseconds, must be > 0
     "medium": 8000,
     "hard": 4000,
 }
-infinite_mode = False
+default_infinite = False
+default_difficulty = "medium"

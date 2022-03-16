@@ -1,7 +1,7 @@
 from pygame import Surface, SRCALPHA, event, QUIT, mouse, SYSTEM_CURSOR_HAND, SYSTEM_CURSOR_ARROW
 
-from assets.settings import windows_height, windows_width, overlay_background_color
 from src.game_objects.menu.button import Button
+from src.settings import windows_height, windows_width, overlay_background_color
 
 RESET = event.custom_type()
 

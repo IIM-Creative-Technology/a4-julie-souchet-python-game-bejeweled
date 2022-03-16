@@ -2,7 +2,7 @@ from typing import Optional
 
 from pygame import display, draw, Surface, Rect, font
 
-from assets.settings import windows_width, windows_height, select_color, background_color, grid_width, total_time, \
+from src.settings import windows_width, windows_height, select_color, background_color, grid_width, total_time, \
     progress_bar_width, infinite_mode, goal_reached_color, goal_not_reached_color, goals, goal_hints
 
 screen: Optional[Surface] = None

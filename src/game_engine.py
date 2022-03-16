@@ -2,10 +2,10 @@ import random
 
 from pygame import time, event, mouse
 
-from assets.settings import total_time, infinite_mode, goals
 from src import screen
 from src.game_grid import GameGrid
 from src.game_objects.menu.game_over_overlay import GameOverOverlay
+from src.settings import total_time, infinite_mode, goals
 from src.sound_engine import SoundEngine
 from src.utils.coordinates import from_pos_to_coord
 

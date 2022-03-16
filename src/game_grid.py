@@ -1,9 +1,9 @@
 from math import floor
 from typing import Optional
 
-from assets.settings import grid_width, grid_height, square_size, minimum_selection
 from src.game_objects.square.base_square import BaseSquare
 from src.game_objects.square.square_factory import SquareFactory
+from src.settings import grid_width, grid_height, square_size, minimum_selection
 from src.utils.coordinates import from_coord_to_pos, from_pos_to_coord
 # type alias
 from src.utils.selection import calculate_group

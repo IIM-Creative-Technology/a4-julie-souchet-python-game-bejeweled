@@ -1,6 +1,6 @@
 from math import floor
 
-from assets.settings import square_size
+from src.settings import square_size
 
 
 def from_pos_to_coord(pos):

@@ -1,3 +1,5 @@
+import random
+
 from pygame import time, event, mouse
 
 from assets.settings import total_time, infinite_mode, goals
@@ -6,6 +8,8 @@ from src.game_grid import GameGrid
 from src.game_objects.menu.game_over_overlay import GameOverOverlay
 from src.sound_engine import SoundEngine
 from src.utils.coordinates import from_pos_to_coord
+
+DEBOUNCE_ALLOW = event.custom_type()
 
 
 class GameEngine:
@@ -22,16 +26,19 @@ class GameEngine:
         # Internal game state
         self.has_changed = False
         self.game_over = None
+        self.start_time = 0
         self.time_left = total_time.get(self.difficulty)
         self.count = 0
+        self.debounce = False
 
-    def reset(self, new_infinite_mode=infinite_mode, difficulty="medium"):
+    def reset(self, new_infinite_mode=infinite_mode, difficulty="easy"):
         """Resets the game state"""
         self.grid.reset()
         self.has_changed = False
         self.game_over = None
         self.count = 0
-        self.time_left = total_time.get(difficulty)
+        self.start_time = time.get_ticks()
+        self.time_left = total_time.get(self.difficulty)
         # Customizable settings
         self.infinite_mode = new_infinite_mode
         self.difficulty = difficulty
@@ -47,14 +54,14 @@ class GameEngine:
 
     def tick(self):
         """Periodically updates the game state"""
-        if self.time_left == 0:  # After game over
+        if not infinite_mode:
+            self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
+
+        if self.time_left <= 0:  # After game over
             if self.game_over is None:
                 self.end_game()
             self.has_changed = self.update_squares() or self.has_changed
         else:  # Normal gameplay
-            if not infinite_mode:
-                self.time_left -= 10
-
             self.has_changed = self.grid.fill_first_line() or self.has_changed
             self.has_changed = self.update_squares() or self.has_changed
 
@@ -96,11 +103,24 @@ class GameEngine:
     def update_squares(self) -> bool:
         """Automatically move all squares if they can be moved"""
         has_changed = False
+        has_impact = False
+
         for column in self.grid.squares:
             for game_object in column:
                 # Skip empty squares
                 if game_object is not None:
+                    was_moving = game_object.is_moving
                     has_changed = game_object.move() or has_changed
+                    if was_moving and not game_object.is_moving:
+                        has_impact = True
+
+        # If at least one square hit bottom, play the sound fx
+        if self.game_over is None and not self.debounce and has_impact:
+            self.sound.play("impact")
+            # Prevent the sound from playing until a delay has passed
+            time.set_timer(DEBOUNCE_ALLOW, 300 + random.randint(-100, 100), 1)
+            self.debounce = True
+
         return has_changed
 
     def update_selection(self):

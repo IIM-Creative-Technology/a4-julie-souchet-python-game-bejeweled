@@ -12,4 +12,6 @@ class SoundEngine:
         }
 
     def play(self, name: str):
-        mixer.find_channel().play(self.sounds.get(name))
+        channel = mixer.find_channel()
+        if channel is not None:
+            channel.play(self.sounds.get(name))

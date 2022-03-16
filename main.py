@@ -3,7 +3,7 @@ import sys
 import pygame
 from pygame.locals import *
 
-from src.game_engine import GameEngine
+from src.game_engine import GameEngine, DEBOUNCE_ALLOW
 from src.game_objects.menu.game_over_overlay import RESET
 
 pygame.init()
@@ -35,6 +35,8 @@ while loop:
             engine.on_mouse_down(event)
         elif event.type == RESET:
             engine.reset()
+        elif event.type == DEBOUNCE_ALLOW:
+            engine.debounce = False
 
 print("Bye!")
 pygame.quit()

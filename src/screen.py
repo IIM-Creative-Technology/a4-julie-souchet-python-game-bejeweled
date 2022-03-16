@@ -1,11 +1,14 @@
 from typing import Optional
 
-from pygame import display, draw, Surface, Rect
+from pygame import display, draw, Surface, Rect, font
 
 from assets.settings import windows_width, windows_height, select_color, background_color, grid_width, total_time, \
     progress_bar_width, infinite_mode, goal_reached_color, goal_not_reached_color, goals, goal_hints
 
 screen: Optional[Surface] = None
+font.init()
+main_font = font.SysFont("Arial", 12)
+title_font = font.Font("assets/HomemadeApple-Regular.ttf", 36)
 
 
 def init():
@@ -85,7 +88,11 @@ def draw_goal(count, difficulty):
     line = Rect(
         rect.left - 2,  # left
         windows_height - goal_height,  # top
-        progress_bar_width + 5,  # width
+        progress_bar_width + 6,  # width
         3  # height
     )
-    draw.rect(screen, 'black', line)
+    draw.rect(screen, "black", line)
+
+    # Goal hint text
+    text = main_font.render(f"{count} / {goal_nb}", True, "black")
+    screen.blit(text, (line.left - 3, line.top - text.get_rect().height))

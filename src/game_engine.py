@@ -17,7 +17,7 @@ class GameEngine:
         self.game_over_overlay = GameOverOverlay()
         self.grid = GameGrid()
         # Settings
-        self.difficulty = "hard"
+        self.difficulty = "medium"
         self.infinite_mode = infinite_mode
         # Internal game state
         self.has_changed = False
@@ -25,7 +25,7 @@ class GameEngine:
         self.time_left = total_time.get(self.difficulty)
         self.count = 0
 
-    def reset(self, new_infinite_mode=infinite_mode, difficulty="hard"):
+    def reset(self, new_infinite_mode=infinite_mode, difficulty="medium"):
         """Resets the game state"""
         self.grid.reset()
         self.has_changed = False

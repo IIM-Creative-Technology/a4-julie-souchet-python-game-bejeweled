@@ -1,6 +1,6 @@
-from pygame import time, event, mouse, QUIT
+from pygame import time, event, mouse
 
-from assets.settings import total_time, infinite_mode
+from assets.settings import total_time, infinite_mode, goals
 from src import screen
 from src.game_grid import GameGrid
 from src.game_objects.menu.game_over_overlay import GameOverOverlay
@@ -16,31 +16,39 @@ class GameEngine:
         self.sound = SoundEngine()
         self.game_over_overlay = GameOverOverlay()
         self.grid = GameGrid()
+        # Internal game state
         self.has_changed = False
-        self.game_over = False
+        self.game_over = None
+        self.count = 0
+        # Settings
+        self.goal = goals.get("medium")
         self.time_left = total_time
         self.infinite_mode = infinite_mode
 
-    def reset(self, new_time_left=total_time, new_infinite_mode=infinite_mode):
+    def reset(self, new_time_left=total_time, new_infinite_mode=infinite_mode, goal="medium"):
         """Resets the game state"""
         self.grid.reset()
         self.has_changed = False
-        self.game_over = False
+        self.game_over = None
+        self.count = 0
         # Customizable settings
         self.time_left = new_time_left
         self.infinite_mode = new_infinite_mode
+        self.goal = goals.get(goal)
 
     def end_game(self):
-        """Ends the game, blocks controls"""
-        self.sound.play("win")
-        self.game_over = True
-        event.set_allowed(QUIT)
+        """Ends the game"""
         self.grid.clear_selection()
+        if self.count < self.goal:
+            self.game_over = "lose"
+        else:
+            self.game_over = "win"
+        self.sound.play(self.game_over)
 
     def tick(self):
         """Periodically updates the game state"""
         if self.time_left == 0:  # After game over
-            if not self.game_over:
+            if self.game_over is None:
                 self.end_game()
             self.has_changed = self.update_squares() or self.has_changed
         else:  # Normal gameplay
@@ -55,7 +63,7 @@ class GameEngine:
 
         if self.has_changed:
             screen.draw_screen(
-                game_over=self.game_over,
+                game_over=self.game_over is not None,
                 squares=self.grid.squares,
                 time=self.time_left,
                 overlay=self.game_over_overlay.surface
@@ -66,7 +74,7 @@ class GameEngine:
     def on_mouse_motion(self, e):
         """Selects the group under the cursor"""
         event.pump()
-        if not self.game_over:
+        if self.game_over is None:
             coord = from_pos_to_coord(e.pos)
             self.has_changed = self.grid.select(coord)
         else:
@@ -75,9 +83,10 @@ class GameEngine:
     def on_mouse_down(self, e):
         """Deletes the selected group"""
         event.pump()
-        if not self.game_over:
-            did_delete = self.grid.remove_selected()
-            if did_delete:
+        if self.game_over is None:
+            delete_count = self.grid.remove_selected()
+            if delete_count > 0:
+                self.count += delete_count
                 self.sound.play("delete")
         else:
             self.game_over_overlay.click(e.pos)

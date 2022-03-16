@@ -12,6 +12,11 @@ select_color = Color(160, 160, 160)
 background_color = Color(255, 255, 255)
 overlay_background_color = Color(0, 0, 0, 160)
 # Gameplay
+goals = {
+    "easy": 50,
+    "medium": 100,
+    "hard": 150,
+}
 minimum_selection = 3
 total_time = 10000  # in milliseconds, must be > 0
 infinite_mode = False

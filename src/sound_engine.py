@@ -7,6 +7,7 @@ class SoundEngine:
         self.sounds = {
             "delete": mixer.Sound("assets/sparkle.wav"),
             "win": mixer.Sound("assets/win.wav"),
+            "lose": mixer.Sound("assets/lose.wav"),
             "impact": mixer.Sound("assets/impact.wav"),
         }
 

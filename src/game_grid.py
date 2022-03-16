@@ -78,7 +78,7 @@ class GameGrid:
         self.set_square(prev_coord, None)
         self.set_square(new_coord, game_object)
 
-    def select_square(self, coord) -> bool:
+    def select(self, coord) -> bool:
         """Select the group of adjacent squares of similar type,
         starting from the given coordinates.
         Returns a boolean indicating if there was a change in selection."""

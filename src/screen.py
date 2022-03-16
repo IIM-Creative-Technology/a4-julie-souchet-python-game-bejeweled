@@ -1,9 +1,9 @@
 from typing import Optional
 
-from pygame import display, draw, Surface
+from pygame import display, draw, Surface, SRCALPHA
 
 from assets.settings import windows_width, windows_height, select_color, background_color, grid_width, total_time, \
-    timer_width
+    timer_width, overlay_background_color
 
 screen: Optional[Surface] = None
 
@@ -35,3 +35,9 @@ def draw_timer(time: float):
         windows_height * time / total_time,  # height: diminishes
     )  # bottom stays constant at the bottom of the screen
     draw.rect(screen, select_color, rect)
+
+
+def draw_overlay():
+    overlay = Surface((windows_width, windows_height), SRCALPHA)  # alpha in pixels
+    overlay.fill(overlay_background_color)
+    screen.blit(overlay, (0, 0))

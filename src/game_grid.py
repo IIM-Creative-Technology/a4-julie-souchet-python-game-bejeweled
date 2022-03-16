@@ -104,18 +104,20 @@ class GameGrid:
         return True
 
     def get_group(self, coord, category):
-        """Gets all adjacent (⬆⬇⬅➡) squares of the same category"""
+        """Gets all adjacent (⬆⬇⬅➡) squares of the same category
+        with a tree search"""
+        # Test current square
         current_square = self.get_square(coord)
         if (current_square is None
                 or current_square.is_moving
                 or current_square.category != category
                 or current_square.is_selected):
-            # print(current_square, "REFUSED")
+            # print("REFUSED", current_square)
             return []
         else:
             current_square.is_selected = True
             square_list = [current_square]
-            # print(current_square, "ACCEPTED")
+            # print("ACCEPTED", current_square)
 
         # Expand the search to the current square's neighbors
         candidates = [

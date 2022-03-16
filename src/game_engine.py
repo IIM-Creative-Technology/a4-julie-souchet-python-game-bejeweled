@@ -13,7 +13,7 @@ class GameEngine:
 
     def tick(self):
         """Periodically updates the game state"""
-        # Is the first line of the grid full?
+        # Is the first line of the grid full yet?
         self.has_changed = self.grid.fill_first_line() or self.has_changed
 
         # Are there objects that can move?
@@ -39,9 +39,20 @@ class GameEngine:
         display.flip()
 
     def handle_mouse_motion(self, e):
+        """Selects the group under the cursor"""
+        event.pump()
         coord = from_pos_to_coord(e.pos)
         self.has_changed = self.grid.select_square(coord)
-        event.pump()
 
     def handle_mouse_down(self, e):
-        pass
+        """Deletes the selected group"""
+        event.pump()
+
+        # If there is no selection -> ignore
+        if self.grid.selected_squares.__len__() == 0:
+            return
+
+        for square in self.grid.selected_squares:
+            coord = from_pos_to_coord(square.pos)
+            self.grid.set_square(coord, None)
+        self.grid.selected_squares = []

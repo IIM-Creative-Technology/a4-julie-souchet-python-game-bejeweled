@@ -26,6 +26,7 @@ while loop:
 
     # Read player inputs
     for event in pygame.event.get():
+        pygame.event.pump()
         # Click the close button = quit game
         if event.type == QUIT:
             loop = False

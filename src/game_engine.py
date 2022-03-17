@@ -69,23 +69,22 @@ class GameEngine:
         """Periodically updates the game state"""
         time.wait(20)
         overlay = None
-        if not self.has_started:
+        if not self.has_started:  # Start menu
             overlay = self.start_overlay.surface
         else:
-            if not self.is_infinite:  # Normal gameplay
-                self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
+            # Update the grid
+            self.has_changed = self.grid.fill_first_line() or self.has_changed
+            self.has_changed = self.update_squares() or self.has_changed
+            if self.has_changed:
+                self.update_selection()
 
-                if self.time_left <= 0:  # After game over
+            if not self.is_infinite:
+                if self.time_left <= 0:  # Game over
                     if self.game_over is None:
                         self.end_game()
                     overlay = self.game_over_overlay.surface
-                    self.has_changed = self.update_squares() or self.has_changed
-
-            self.has_changed = self.grid.fill_first_line() or self.has_changed
-            self.has_changed = self.update_squares() or self.has_changed
-
-            if self.has_changed:
-                self.update_selection()
+                else:  # Normal gameplay
+                    self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
 
         if self.has_changed:
             screen.draw_screen(
@@ -100,7 +99,9 @@ class GameEngine:
             self.has_changed = False
 
     def on_mouse_motion(self, e):
-        """Selects the group under the cursor"""
+        """Executes the appropriate action according to the game state:
+        - in menu: transmits the position of the cursor to the menu
+        - in game: selects the hovered group"""
         if not self.has_started:  # start menu
             self.start_overlay.on_mouse_motion(e.pos)
         elif self.game_over is None:  # main game
@@ -110,10 +111,16 @@ class GameEngine:
             self.game_over_overlay.on_mouse_motion(e.pos)
 
     def on_mouse_down(self, e):
-        """Deletes the selected group"""
+        """Executes the appropriate action according to the game state:
+        - in menu: click on the button
+        - in game: delete the selected group"""
         if not self.has_started:  # start menu
             self.start_overlay.click(e.pos)
-        elif self.game_over is None:  # main game
+
+        elif self.game_over is not None:  # game over menu
+            self.game_over_overlay.click(e.pos)
+
+        else:  # main game
             delete_count = self.grid.remove_selected()
             if delete_count > 0:
                 self.count += delete_count
@@ -125,13 +132,10 @@ class GameEngine:
                         self.start_time + time_bonus
                     ])
                 elif self.count > self.goal:  # infinite mode: change the goalpost
-                    print(f"reached {self.goal}")
                     self.goal += goals.get(self.difficulty)
-        else:  # game over menu
-            self.game_over_overlay.click(e.pos)
 
     def update_squares(self) -> bool:
-        """Automatically move all squares if they can be moved"""
+        """Automatically move all squares (if they can be moved)"""
         has_changed = False
         has_impact = False
 

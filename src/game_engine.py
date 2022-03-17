@@ -69,9 +69,6 @@ class GameEngine:
         if not self.has_started:
             overlay = self.start_overlay.surface
         else:
-            if not self.is_infinite:  # Infinite mode
-                self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
-
             if self.time_left <= 0:  # After game over
                 overlay = self.game_over_overlay.surface
                 self.has_changed = self.update_squares() or self.has_changed
@@ -79,6 +76,8 @@ class GameEngine:
                     self.end_game()
 
             else:  # Normal gameplay
+                if not self.is_infinite:
+                    self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
                 self.has_changed = self.grid.fill_first_line() or self.has_changed
                 self.has_changed = self.update_squares() or self.has_changed
 
@@ -87,12 +86,12 @@ class GameEngine:
 
         if self.has_changed:
             screen.draw_screen(
-                game_over=self.game_over is not None,
                 squares=self.grid.squares,
                 time=self.time_left,
                 overlay=overlay,
                 difficulty=self.difficulty,
                 count=self.count,
+                is_infinite=self.is_infinite
             )
             self.has_changed = False
 
@@ -117,6 +116,12 @@ class GameEngine:
             if delete_count > 0:
                 self.count += delete_count
                 self.sound.play("delete")
+                if not self.is_infinite:
+                    time_bonus = delete_count * 125  # + 1/8th second for each deleted
+                    self.start_time = min([
+                        time.get_ticks() + total_time.get(self.difficulty),
+                        self.start_time + time_bonus
+                    ])
         else:  # game over menu
             self.game_over_overlay.click(e.pos)
 

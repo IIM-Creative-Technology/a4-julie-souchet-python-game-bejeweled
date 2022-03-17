@@ -3,7 +3,7 @@ from typing import Optional
 from pygame import display, draw, Surface, Rect, font
 
 from src.settings import windows_width, windows_height, select_color, background_color, grid_width, total_time, \
-    progress_bar_width, goal_reached_color, goal_not_reached_color, goals, goal_hints
+    progress_bar_width, goal_reached_color, goal_not_reached_color, goal_hints
 
 screen: Optional[Surface] = None
 font.init()
@@ -17,7 +17,7 @@ def init():
         screen = display.set_mode((windows_width, windows_height))
 
 
-def draw_screen(squares, time, overlay, difficulty, count, is_infinite):
+def draw_screen(squares, time, overlay, difficulty, is_infinite, count, goal):
     """Re-draws the screen according to the current game state"""
     # TODO only redraw parts that have changed
     draw_background()
@@ -31,7 +31,7 @@ def draw_screen(squares, time, overlay, difficulty, count, is_infinite):
     if overlay is not None:
         screen.blit(overlay, (0, 0))
     else:
-        draw_goal(count, difficulty, not is_infinite)
+        draw_goal(count, goal, goal_hints.get(difficulty), not is_infinite)
         if not is_infinite:
             draw_timer(time, total_time.get(difficulty))
 
@@ -61,9 +61,7 @@ def draw_timer(time: float, total: int):
     draw.rect(screen, select_color, rect)
 
 
-def draw_goal(count, difficulty, show_timer):
-    goal_nb = goals.get(difficulty)
-    goal_height = goal_hints.get(difficulty)
+def draw_goal(count, goal_nb, goal_height, show_timer):
     if show_timer:
         left = grid_width + 10
     else:

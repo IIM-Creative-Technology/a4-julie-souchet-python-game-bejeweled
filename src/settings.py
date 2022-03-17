@@ -11,6 +11,7 @@ goal_hints = {
     "easy": windows_height / 4,
     "medium": windows_height / 2,
     "hard": windows_height * 3 / 4,
+    "infinite": windows_height * 3 / 4,
 }
 # Colors
 goal_not_reached_color = Color(128, 128, 200)
@@ -20,15 +21,14 @@ background_color = Color(255, 255, 255)
 overlay_background_color = Color(0, 0, 0, 160)
 # Gameplay
 goals = {
-    "easy": 50,
-    "medium": 100,
+    "easy": 100,
+    "medium": 125,
     "hard": 150,
+    "infinite": 100
 }
 minimum_selection = 3
 total_time = {  # in milliseconds, must be > 0
-    "easy": 15000,
-    "medium": 8000,
+    "easy": 8000,
+    "medium": 6000,
     "hard": 4000,
 }
-default_infinite = False
-default_difficulty = "medium"

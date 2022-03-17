@@ -6,7 +6,7 @@ from src import screen
 from src.game_grid import GameGrid
 from src.game_objects.menu.game_over_overlay import GameOverOverlay
 from src.game_objects.menu.start_overlay import StartOverlay
-from src.settings import total_time, default_infinite, goals, default_difficulty
+from src.settings import total_time, goals
 from src.sound_engine import SoundEngine
 from src.utils.coordinates import from_pos_to_coord
 from src.utils.custom_events import *
@@ -22,12 +22,13 @@ class GameEngine:
         self.start_overlay = StartOverlay()
         self.grid = GameGrid()
         # Settings
-        self.difficulty = default_difficulty
-        self.is_infinite = default_infinite
+        self.difficulty = None
+        self.is_infinite = None
         # Internal game state
         self.count = 0
         self.debounce = False
         self.game_over = None
+        self.goal = goals.get(self.difficulty)
         self.has_changed = True
         self.has_started = False
         self.start_time = 0
@@ -42,13 +43,14 @@ class GameEngine:
         self.has_changed = True
         self.has_started = False
 
-    def start(self, difficulty, is_infinite=default_infinite):
+    def start(self, difficulty, is_infinite=False):
         print(f"Started game on {difficulty} (infinite={is_infinite})")
         self.grid.reset()
         # Customizable settings
         self.difficulty = difficulty
         self.is_infinite = is_infinite
         # Internal game state
+        self.goal = goals.get(self.difficulty)
         self.has_started = True
         self.start_time = time.get_ticks()
         self.time_left = total_time.get(self.difficulty)
@@ -56,7 +58,7 @@ class GameEngine:
     def end_game(self):
         """Ends the game"""
         self.grid.clear_selection()
-        if self.count < goals.get(self.difficulty):
+        if self.count < self.goal:
             self.game_over = "lose"
         else:
             self.game_over = "win"
@@ -69,20 +71,20 @@ class GameEngine:
         if not self.has_started:
             overlay = self.start_overlay.surface
         else:
-            if self.time_left <= 0:  # After game over
-                overlay = self.game_over_overlay.surface
-                self.has_changed = self.update_squares() or self.has_changed
-                if self.game_over is None:
-                    self.end_game()
+            if not self.is_infinite:  # Normal gameplay
+                self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
 
-            else:  # Normal gameplay
-                if not self.is_infinite:
-                    self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
-                self.has_changed = self.grid.fill_first_line() or self.has_changed
-                self.has_changed = self.update_squares() or self.has_changed
+                if self.time_left <= 0:  # After game over
+                    overlay = self.game_over_overlay.surface
+                    self.has_changed = self.update_squares() or self.has_changed
+                    if self.game_over is None:
+                        self.end_game()
 
-                if self.has_changed:
-                    self.update_selection()
+            self.has_changed = self.grid.fill_first_line() or self.has_changed
+            self.has_changed = self.update_squares() or self.has_changed
+
+            if self.has_changed:
+                self.update_selection()
 
         if self.has_changed:
             screen.draw_screen(
@@ -91,6 +93,7 @@ class GameEngine:
                 overlay=overlay,
                 difficulty=self.difficulty,
                 count=self.count,
+                goal=self.goal,
                 is_infinite=self.is_infinite
             )
             self.has_changed = False
@@ -116,12 +119,15 @@ class GameEngine:
             if delete_count > 0:
                 self.count += delete_count
                 self.sound.play("delete")
-                if not self.is_infinite:
+                if not self.is_infinite:  # normal mode: add time to the timer
                     time_bonus = delete_count * 125  # + 1/8th second for each deleted
                     self.start_time = min([
                         time.get_ticks() + total_time.get(self.difficulty),
                         self.start_time + time_bonus
                     ])
+                elif self.count > self.goal:  # infinite mode: change the goalpost
+                    print(f"reached {self.goal}")
+                    self.goal += goals.get(self.difficulty)
         else:  # game over menu
             self.game_over_overlay.click(e.pos)
 

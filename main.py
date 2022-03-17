@@ -4,7 +4,6 @@ import pygame
 from pygame.locals import *
 
 from src.game_engine import GameEngine
-from src.settings import default_difficulty
 from src.utils.custom_events import *
 
 pygame.init()
@@ -48,7 +47,7 @@ while loop:
         elif event.type == START_HARD:
             engine.start("hard", False)
         elif event.type == START_INFINITE:
-            engine.start(default_difficulty, True)
+            engine.start("infinite", True)
 
 print("Bye!")
 pygame.quit()

@@ -1,4 +1,4 @@
-from pygame import Surface, SRCALPHA, mouse, SYSTEM_CURSOR_HAND, SYSTEM_CURSOR_ARROW
+from pygame import Surface, SRCALPHA, mouse, SYSTEM_CURSOR_HAND, SYSTEM_CURSOR_ARROW, font
 
 from src.settings import windows_height, windows_width, overlay_background_color
 
@@ -8,6 +8,7 @@ class Overlay:
         self.surface = Surface((windows_width, windows_height), SRCALPHA)
         self.surface.fill(overlay_background_color)
         self.buttons = buttons
+        self.font = font.Font("assets/fonts/HomemadeApple-Regular.ttf", 56)
 
         # Draw buttons
         for button in self.buttons:

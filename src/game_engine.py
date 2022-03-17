@@ -18,7 +18,7 @@ class GameEngine:
     def __init__(self):
         screen.init()
         self.sound = SoundEngine()
-        self.game_over_overlay = GameOverOverlay()
+        self.game_over_overlay = None
         self.start_overlay = StartOverlay()
         self.grid = GameGrid()
         # Settings
@@ -63,6 +63,7 @@ class GameEngine:
         else:
             self.game_over = "win"
         self.sound.play(self.game_over)
+        self.game_over_overlay = GameOverOverlay(self.count >= self.goal)
 
     def tick(self):
         """Periodically updates the game state"""
@@ -75,10 +76,10 @@ class GameEngine:
                 self.time_left = self.start_time + total_time.get(self.difficulty) - time.get_ticks()
 
                 if self.time_left <= 0:  # After game over
-                    overlay = self.game_over_overlay.surface
-                    self.has_changed = self.update_squares() or self.has_changed
                     if self.game_over is None:
                         self.end_game()
+                    overlay = self.game_over_overlay.surface
+                    self.has_changed = self.update_squares() or self.has_changed
 
             self.has_changed = self.grid.fill_first_line() or self.has_changed
             self.has_changed = self.update_squares() or self.has_changed
@@ -100,7 +101,6 @@ class GameEngine:
 
     def on_mouse_motion(self, e):
         """Selects the group under the cursor"""
-        event.pump()
         if not self.has_started:  # start menu
             self.start_overlay.on_mouse_motion(e.pos)
         elif self.game_over is None:  # main game
@@ -111,7 +111,6 @@ class GameEngine:
 
     def on_mouse_down(self, e):
         """Deletes the selected group"""
-        event.pump()
         if not self.has_started:  # start menu
             self.start_overlay.click(e.pos)
         elif self.game_over is None:  # main game

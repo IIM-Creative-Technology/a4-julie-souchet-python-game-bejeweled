@@ -8,7 +8,6 @@ from src.settings import windows_width, windows_height, select_color, background
 screen: Optional[Surface] = None
 font.init()
 main_font = font.SysFont("Arial", 12)
-title_font = font.Font("assets/fonts/HomemadeApple-Regular.ttf", 36)
 
 
 def init():

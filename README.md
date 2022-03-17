@@ -1,5 +1,12 @@
-# a4-julie-souchet-python-game-bejeweled
+# Pyjeweled
+
+![](assets/screenshot.png)
 Python game using pygame
 
-Activating virtual environment on Windows :
-> cmd: .venv\Scripts\activate.bat
+Installing the dependencies
+> pip install
+
+Launching the game
+> python -m main
+
+Enjoy! 

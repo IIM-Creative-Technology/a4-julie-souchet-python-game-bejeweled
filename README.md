@@ -10,3 +10,5 @@ Launching the game
 > python -m main
 
 Enjoy! 
+
+(Bonus : https://github.com/IIM-Creative-Technology/a4-julie-souchet-python-bonus-pathfinder)
